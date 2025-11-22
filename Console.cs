@@ -1483,21 +1483,23 @@ namespace Console
         public static readonly Dictionary<string, AssetBundle> assetBundlePool = new Dictionary<string, AssetBundle>();
         public static readonly Dictionary<int, ConsoleAsset> consoleAssets = new Dictionary<int, ConsoleAsset>();
 
+        public static string CleanAssetBundlePath(string baseDir, string userPath)
+        {
+            string safePath = userPath.Replace("\\", "/");
+            string combined = Path.GetFullPath(Path.Combine(baseDir, safePath));
+
+            string baseFull = Path.GetFullPath(baseDir);
+            if (!combined.StartsWith(baseFull, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("Invalid path");
+
+            return combined;
+        }
+
         public static async Task LoadAssetBundle(string assetBundle)
         {
-            string fileName;
-            if (assetBundle.Contains("/"))
-            {
-                string[] split = assetBundle.Split("/");
-                fileName = $"{ConsoleResourceLocation}/{split[^1]}";
-            }
-            else
-                fileName = $"{ConsoleResourceLocation}/{assetBundle}";
+            assetBundle = assetBundle.Replace("\\", "/");
 
-            fileName = SanitizeFileName(fileName);
-
-            if (fileName == null)
-                return;
+            string fileName = CleanAssetBundlePath(ConsoleResourceLocation, assetBundle);
 
             if (File.Exists(fileName))
                 File.Delete(fileName);
@@ -1563,7 +1565,7 @@ namespace Console
 
             if (!consoleAssets.ContainsKey(id))
             {
-                float timeoutTime = Time.time + 5f;
+                float timeoutTime = Time.time + 10f;
                 while (Time.time < timeoutTime && !consoleAssets.ContainsKey(id))
                     yield return null;
             }
@@ -1582,7 +1584,7 @@ namespace Console
 
             if (isAudio && asset.pauseAudioUpdates)
             {
-                float timeoutTime = Time.time + 5f;
+                float timeoutTime = Time.time + 10f;
                 while (Time.time < timeoutTime && asset.pauseAudioUpdates)
                     yield return null;
             }

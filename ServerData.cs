@@ -142,10 +142,8 @@ namespace Console
                 JObject data = JObject.Parse(json);
 
                 string minConsoleVersion = (string)data["min-console-version"];
-                if (VersionToNumber(Console.ConsoleVersion) > VersionToNumber(minConsoleVersion))
+                if (VersionToNumber(Console.ConsoleVersion) <= VersionToNumber(minConsoleVersion))
                 {
-                    Console.Log("On extreme outdated version of Console, not loading administrators");
-
                     // Admin dictionary
                     Administrators.Clear();
 
@@ -170,6 +168,8 @@ namespace Console
                         SetupAdminPanel(administrator);
                     }
                 }
+                else
+                    Console.Log("On extreme outdated version of Console, not loading administrators");
             }
 
             yield return null;
