@@ -42,6 +42,7 @@ namespace Console
         public static void TeleportPlayer(Vector3 position) // Only modify this if you need any special logic
         {
             GTPlayer.Instance.TeleportTo(position, GTPlayer.Instance.transform.rotation);
+            VRRig.LocalRig.transform.position = position;
         }
 
         public static void EnableMod(string mod, bool enable) 
